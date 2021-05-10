@@ -113,7 +113,7 @@ module testbench();		//信号声明
 	end
 	always #(T/2)
 		clk=~clk;
-	dcl_1778_6 divider(
+	Top divider(
 		.clk(clk),
 		.f0(f0),
 		.f1(f1)
