@@ -5,19 +5,19 @@ reg [13:0]Q;//计数器需要计数15000次换算成二进制为14位
 
 always@(posedge clk)
 begin
-	if(f0&Q<=750)	//750:15000仿真时这里填750，实验时改成15000
+	if(f0&Q<=15000)
 	begin
 		Q<=Q+16'd1;
 		f1<=1'd1;
 	end
-	else if(f0&Q>=750)
+	else if(f0&Q>=15000)
 	begin
 		Q<=Q+16'd1;
 		f1<=1'd0;
 	end
 	else
 	begin
-		if(!f0&Q>0&Q<=750)
+		if(!f0&Q>0&Q<=15000)
 		begin
 			Q<=Q+16'd1;
 			f1<=1'd1;
