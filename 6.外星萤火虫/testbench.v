@@ -7,12 +7,6 @@ module testbench();		//信号声明
 	initial		//复位
 	begin
 		clk = 0;
-		/*p 	 = 0;
-		sta = 0;
-		#10000000	//10ms
-		p   = 1;
-		#5000000	//5ms
-		sta = 1;*/
 	end
 	initial
 	begin//20组f0,f0周期1ms，频率1000Hz
