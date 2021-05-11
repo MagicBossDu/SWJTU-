@@ -1,7 +1,7 @@
 `timescale 1ns / 1ns		//仿真时间单位/时间精度
 module testbench();		//信号声明
-	reg f0,clk,p,sta;
-	wire f1,f2;
+	reg f0,clk;
+	wire f1;
 	
 	parameter T = 20;	//初始周期20ns
 	initial		//复位
