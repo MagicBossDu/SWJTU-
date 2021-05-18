@@ -2,7 +2,28 @@
 > 1. 代码`还有bug`，我没法仿真出来，原因是PLL模块仿真时一直输出高阻态，但是`不影响实验`  
 > 2. 仿真出不了结果，但我还是把testbench附上了，有兴趣的自己改改TOP文件里调用PLL的部分  
 ### `一定要看代码里的注释！！！！`
-有的同学看不到下面的图片，我把步骤放到[这里](https://wwa.lanzoui.com/isbqbp909ad)，可以下载下来查看
+有的同学看不到下面的图片，我把步骤放到[这里](https://wwa.lanzoui.com/isbqbp909ad)，可以下载下来查看  
+## 引脚分配表
+|信号名|引脚|主板器件|
+|------|----|--------|
+|SEG[7]|Pin_120|SEG7|
+|SEG[6]|Pin_113|SEG6|
+|SEG[5]|Pin_121|SEG5|
+|SEG[4]|Pin_114|SEG4|
+|SEG[3]|Pin_125|SEG3|
+|SEG[2]|Pin_115|SEG2|
+|SEG[1]|Pin_126|SEG1|
+|SEG[0]|Pin_119|SEG0|
+|codeout[6]|Pin_112|a|
+|codeout[5]|Pin_100|b|
+|codeout[4]|Pin_104|c|
+|codeout[3]|Pin_111|d|
+|codeout[2]|Pin_106|e|
+|codeout[1]|Pin_110|f|
+|codeout[0]|Pin_103|g|
+|ft|Pin_23|ECLK|
+|inclk0|Pin_90|50MHz|
+
 
 # 下面是生成PLL模块，我把步骤放下面  
 ------
