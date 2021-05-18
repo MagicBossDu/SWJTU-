@@ -2,7 +2,7 @@ module Top(inclk0,ft,T,codeout,SEG);
 //CLK 50MHz; ft 被测信号; T 周期
 input inclk0,ft;		//50MHz; 被测信号
 output [9:0]T;		//周期T在20到500之间
-wire c0;		//100Mhz,1000Hz
+wire c0;		//100Mhz
 wire CLKL;
 wire [3:0]q1;
 wire [3:0]q2;
@@ -12,7 +12,6 @@ output reg [7:0]SEG;
 reg [2:0]cnt;
 wire [6:0]codeout1,codeout2,codeout3,codeout4;
 output reg [6:0]codeout;
-wire c0;
 
 PLL PLL(inclk0,c0);	//产生100MHz信号 	请把这行的第一个PLL改成PLL模块的名字
 main main(c0,ft,tH,T);	//测出高电平信号和总周期，数值为10ns的倍数----请把这行的第一个main改成main模块里的名字（main模块改学号命名）
