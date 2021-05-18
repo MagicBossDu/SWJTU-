@@ -14,7 +14,7 @@ wire [6:0]codeout1,codeout2,codeout3,codeout4;
 output reg [6:0]codeout;
 wire c0;
 
-PLL PLL(inclk0,c0);	//产生100MHz信号		不工作
+PLL PLL(inclk0,c0);	//产生100MHz信号 	请把这行的第一个PLL改成PLL模块的名字
 main main(c0,ft,tH,T);	//测出高电平信号和总周期，数值为10ns的倍数----请把这行的第一个main改成main模块里的名字（main模块改学号命名）
 split split(T*10,q1,q2,q3,q4);	//请把这行的第一个split改成split模块里的名字（split模块改学号命名）
 decode decode1(q1,codeout1);		//请把这行的第一个decode改成decode模块里的名字（decode模块改学号命名）
