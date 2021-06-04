@@ -1,5 +1,5 @@
 这是最后一次实验，包含测周期和测占空比  
-这一次实验同样需要生成PLL文件，文件名pll_test，生成方法看这个[教程](https://wwa.lanzoui.com/i5KAfp9tb6f)  
+这一次实验同样需要生成PLL文件，文件名pll_test，生成方法看这个[教程](https://wwa.lanzoui.com/isbqbp909ad)  
 代码并不是我写的，`仿真不会出结果，但是不影响正常实验`  
 记得改名字  
 ## 引脚分配表
