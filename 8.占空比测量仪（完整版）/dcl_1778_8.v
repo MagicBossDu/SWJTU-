@@ -1,154 +1,138 @@
-module dcl_1778_8(ft,clk,clr,SEG,fout,codeout,dot,tH,T,q1,q2,q3,q4);
-//Q为占空比的一百倍,T为周期，tH为高电平时长，q1,q2,q3,q4分别为Q的个位，十位，百位，千位，
-input ft,clk,clr;
-output reg [9:0]tH=10'b1;
-output reg [9:0]T=10'b1;
-reg [31:0]rtH=31'b1;
-reg [31:0]rT=31'b1;
-reg [31:0]x;
-reg [3:0]Y;
-output fout;
-reg [17:0]t;
-reg [15:0]Q;
-reg [31:0]tempa;  
-reg [31:0]tempb;  
-reg [63:0]temp_a;  
-reg [63:0]temp_b;  
-reg [31:0]rQ;
-output reg [3:0]q1;
-output reg [3:0]q2;
-output reg [3:0]q3;
-output reg [3:0]q4;
-reg [15:0]TQ;
-output reg [7:0]SEG;
-output reg [6:0]codeout;
-output reg dot;
+module Top(
+	input	 				clk,
+	input					rst_n,
+	input					wave,
+	input             switch,
+	output   reg[3:0] seg = 0,
+   output   reg[7:0] codeout = 0,
+	output   reg      led
+);
 
-PLL cnnt(clk,fout);
+wire fout; 
+reg [13:0]   num = 0;
+reg [3:0]   d1,d2,d3,d4;
+reg [13:0]	 T = 0;   
+reg [13:0]  duty_cycle = 0;
+pll_test cnnt(clk,fout);
+reg  state;
+localparam high_state=1'd0;
+localparam low_state=1'd1;
+reg [25:0]   high_cnt;
+reg [25:0]   low_cnt;
+reg [25:0]   high_time;
+reg [25:0]   low_time;
+reg [3:0]    dat;
+reg [1:0]    curseg = 0;
+integer segcnt = 0;
+
+always@(posedge fout or negedge rst_n)
+	if(!rst_n)
+		begin
+			state<=high_state;
+			high_cnt<=26'd0;
+			low_cnt<=26'd0;
+			high_time<=26'd0;
+			low_time<=26'd0;
+		end
+	else begin
+		case(state)
+			high_state:	begin
+								if(wave==1)
+									begin
+										high_cnt<=high_cnt+1'b1;
+										state<=high_state;
+									end
+								else begin
+									high_cnt<=26'd0;
+									high_time<=high_cnt;
+									state<=low_state;
+								end
+							end
+			low_state :	begin
+								if(wave==0)
+									begin
+										low_cnt<=low_cnt+1'b1;
+										state<=low_state;
+									end
+								else begin
+									low_time<=low_cnt;
+									low_cnt<=26'd0;
+									state<=high_state;
+								end
+				
+							end
+			default:state<=high_state;
+		endcase
+
+
+T<=((high_time+1)*4'd10+(low_time+1)*4'd10);
+duty_cycle<=high_time*10000/(high_time+low_time); //有两位小数但没有小数点
+end
+
+always @(posedge fout)
+begin
+	segcnt <= segcnt + 1;
+		
+	if (segcnt == 10000)
+	begin
+		segcnt <= 0;
+		curseg <= curseg + 1;
+	end
+end
 
 always@(posedge fout)
 begin
-	if(ft&(rtH==rT))
-	begin
-		rtH<=rtH+31'b1;
-		rT<=rT+31'b1;
+	if(!switch) begin
+		num <= T;
+		codeout[0] = 0;
 	end
-	else
-	begin
-		if(~ft&(rtH<=rT))
-		begin
-			rtH<=rtH;
-			rT<=rT+31'b1;
-		end
-		else
-		begin
-			rtH<=31'b1;
-			rT<=31'b1;
-		end
+	else begin
+		num <= duty_cycle;
+		case (curseg)
+			2'b00: codeout[0] = 0;
+			2'b01: codeout[0] = 1;
+			2'b10: codeout[0] = 0;
+			2'b11: codeout[0] = 0; 
+		endcase
 	end
-	x=rtH*10000;
+	if(num < 10000)
+	begin
+	led <= 0;
+   d1 <= num/1000;
+	d2 <= num/100%10;
+	d3 <= num/10%10;
+	d4 <= num%10;
+	end
+	else   led <= 1;
 end
-
-integer i;  
-  
-always @(x or rT)  
-begin  
-    tempa <= x;  
-    tempb <= rT;  
-end  
-  
-always @(tempa or tempb)  
-begin  
-    temp_a = {32'h00000000,tempa};  
-    temp_b = {tempb,32'h00000000};   
-    for(i = 0;i < 32;i = i + 1)  
-        begin  
-            temp_a = {temp_a[62:0],1'b0};  
-            if(temp_a[63:32] >= tempb)  
-                temp_a = temp_a - temp_b + 1'b1;  
-            else  
-                temp_a = temp_a;  
-        end  
-  
-    rQ <= temp_a[31:0];   
-end  
-
-always@(posedge ft)
+			
+always @(posedge fout)
 begin
-	tH=rtH;
-	T=rT;
-	Q=rQ;
-	if(clr)
-		TQ=T;
-	else
-		TQ=Q;
-	q1=TQ/1000;             //提取千位数
-	q2=(TQ%1000)/100;      //提取百位数
-	q3=(TQ%100)/10;        //提取十位数
-	q4=TQ%10;              //提取个位数
-end
-
-always@(posedge clk)
-begin
-	if(t<=50000)
-	begin
-		t<=t+1'd1;
-		SEG<=8'b00000001;
-		Y<=q1;
-	end
-	else
-	begin
-		if(t<=100000)
-		begin
-			t<=t+1'd1;
-			SEG<=8'b00000010;
-			Y<=q2;
-		end
-		else
-		begin
-			if(t<=150000)
-			begin
-				t<=t+1'd1;
-				SEG<=8'b00000100;
-				Y<=q3;
-			end
-			else
-			begin
-				if(t<=200000)
-				begin
-					t<=t+1'd1;
-					SEG<=8'b00001000;
-					Y<=q4;
-				end
-				else
-					t<=1'd0;
-			end
-		end
-	end
-end
-
-always@(Y)
-begin
-	case(Y)
-		4'd0: codeout=7'b1111110;    
-		4'd1: codeout=7'b0110000;
-		4'd2: codeout=7'b1101101;
-		4'd3: codeout=7'b1111001;
-		4'd4: codeout=7'b0110011;
-		4'd5: codeout=7'b1011011;
-		4'd6: codeout=7'b1011111;
-		4'd7: codeout=7'b1110000;
-		4'd8: codeout=7'b1111111;
-		4'd9: codeout=7'b1111011;
-		default: codeout=7'bx;  
+	seg = 4'b0000;
+	case (curseg)
+		2'b00: 	begin dat = d1; seg = 4'b1000; end
+		2'b01: 	begin dat = d2; seg = 4'b0100; end
+		2'b10: 	begin dat = d3; seg = 4'b0010; end
+		2'b11: 	begin dat = d4; seg = 4'b0001; end
+		default: begin dat = 4'bx; seg = 4'bx;  end
 	endcase
 end
 
-always@(SEG)
+always @(posedge fout)
 begin
-	if(SEG==8'b00000100)
-		dot<=1'd1;
-	else
-		dot<=1'd0;
+	case(dat)
+		4'd0    : codeout = 7'b1111110;
+		4'd1    : codeout = 7'b0110000;
+		4'd2    : codeout = 7'b1101101;
+		4'd3    : codeout = 7'b1111001;
+		4'd4    : codeout = 7'b0110011;
+		4'd5    : codeout = 7'b1011011;
+		4'd6    : codeout = 7'b1011111;
+		4'd7    : codeout = 7'b1110000;
+		4'd8    : codeout = 7'b1111111;
+		4'd9    : codeout = 7'b1111011;
+		default : codeout = 7'b1001111; 
+	endcase
 end
+
 endmodule
